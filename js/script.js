@@ -48,7 +48,7 @@ tabParent.addEventListener('click', (event) =>{
 
 
 
-//таймер
+// логика таймера, получаетдату преобразует  его в переменные и отдает дальше 
 
 const deadline = '2021-06-14';
 
@@ -75,7 +75,7 @@ function getZero(num){
         return num;
     }
 }
-
+// работа с селектором таймера, внутри функция по обновлению 
 function setClock(selector, endTime){
     const timer = document.querySelector(selector),
         days = timer.querySelector('#days'),
@@ -84,7 +84,7 @@ function setClock(selector, endTime){
         seconds = timer.querySelector('#seconds'),
         timeInterval= setInterval(updateClock, 1000);
     updateClock();
-
+// функция для обновления таймера
     function updateClock(){
         const t = getTimeRemaining(endTime);
 
@@ -99,13 +99,68 @@ function setClock(selector, endTime){
 }
 
 
-
-
-
 setClock('.timer', deadline);
 
 
 
+// реализация модального окна "связаться с нами"
+
+const    modalWind = document.querySelector('.modal'),
+        modalBtn = document.querySelectorAll('[Data-modal]'),
+        modalClose = document.querySelector('.modal__close');
+
+
+//реальзация открытия окна
+function openModal(){
+    modalWind.classList.add('show');
+    modalWind.classList.remove('hide');
+    document.body.style.overflow = "hidden";
+    clearInterval(modalTimerId);
+}
+//реализация закрытия окна
+function closeModal(){
+    modalWind.classList.remove('show');
+    modalWind.classList.add('hide');
+    document.body.style.overflow = "";
+}
+
+//вешаем обработчик событий на кнопку открытия окна
+modalBtn.forEach(item => {
+    item.addEventListener('click', () => {
+    openModal();
+    });
+});
+
+//реализуем закрытие окна при нажатии сбоку от окна
+modalWind.addEventListener('click', (e)=>{
+    if(e.target && e.target === modalWind){
+        closeModal();
+    }
+});
+// вешаем на документ обработчик собыйтий (нажатий на клавиатуру) для закрытия на esc
+document.addEventListener('keydown', (event) => {
+    if(event.code === 'Escape' && modalWind.classList.contains('show')){
+        closeModal();
+    } 
+});
+
+//вешаем обработчик событий на кнопку закрытия окна 
+modalClose.addEventListener('click', () => {
+    closeModal();
+});
+// таймер для открытия модального окна через время
+const modalTimerId = setTimeout(openModal, 60000);
+
+
+// еслил мы прокрутили страницу до конца то открываем окно
+function showModalByScroll(){
+    if(window.pageYOffset + document.documentElement.clientHeight>= document.documentElement.scrollHeight){
+        openModal();
+        window.removeEventListener('scroll', showModalByScroll);
+    }
+}
+
+window.addEventListener('scroll', showModalByScroll);
 
 
 });
