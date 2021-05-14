@@ -149,7 +149,7 @@ modalClose.addEventListener('click', () => {
     closeModal();
 });
 // таймер для открытия модального окна через время
-// const modalTimerId = setTimeout(openModal, 60000);
+const modalTimerId = setTimeout(openModal, 60000);
 
 
 // еслил мы прокрутили страницу до конца то открываем окно
