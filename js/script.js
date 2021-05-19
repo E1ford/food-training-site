@@ -109,8 +109,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // реализация модального окна "связаться с нами"
 
     const    modalWind = document.querySelector('.modal'),
-            modalBtn = document.querySelectorAll('[Data-modal]'),
-            modalClose = document.querySelector('.modal__close');
+            modalBtn = document.querySelectorAll('[Data-modal]');
 
 
     //реальзация открытия окна
@@ -136,7 +135,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     //реализуем закрытие окна при нажатии сбоку от окна
     modalWind.addEventListener('click', (e)=>{
-        if(e.target && e.target === modalWind){
+        if(e.target && e.target === modalWind || e.target.classList.contains('modal__close')){
             closeModal();
         }
     });
@@ -148,9 +147,6 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     //вешаем обработчик событий на кнопку закрытия окна 
-    modalClose.addEventListener('click', () => {
-        closeModal();
-    });
     // таймер для открытия модального окна через время
     const modalTimerId = setTimeout(openModal, 60000);
 
@@ -173,7 +169,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // просто текстовая информация, используется для отображения работы
     const message = {
-        loading:'загрузка',
+        loading:'img/form/spinner.svg',
         success:'спасибо мы скоро с вами свяжимся',
         failure:'что то пошло не так...',
     };
@@ -189,9 +185,12 @@ window.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
 
             // нужно для отображения информации типа (загрузка, успешно и тд)
-            let statusMessage = document.createElement('div');
-            statusMessage.classList.add('status');
-            statusMessage.textContent = message.loading;
+            let statusMessage = document.createElement('img');
+            statusMessage.src = message.loading;
+            statusMessage.style.cssText = `
+            display: block;
+            margin: 0 auto;
+            `;
             form.append(statusMessage);
             // создаем сам запрос
             const request = new XMLHttpRequest(); 
@@ -215,24 +214,53 @@ window.addEventListener('DOMContentLoaded', () => {
 
                     // выводим информацию ЭХО (то что ушло на сервер)
                     console.log(request.response);
-                    statusMessage.textContent = message.success;
+                    showThanksModal(message.success);
 
                     // отчищаем формы от информации
                     form.reset();
-                    setTimeout(() => {
-                        statusMessage.remove();
-                    }, 2000);
+                    
+                    statusMessage.remove();
                 } else{
 
                     // если ошибка
-                    statusMessage.textContent = message.failure;
+                    showThanksModal(message.failure);
                 }
             });
         });
     }
+// функция для реализации всплывающего окна
+    function showThanksModal(message){
+        // получаем окно 
+        const prevModalDialog = document.querySelector('.modal__dialog');
+        // скрываем окно 
+        prevModalDialog.classList.add('hide');
+        // // открываем окно
+        openModal();
+        // создаем новое окно без инпутов
+        const thanksModal = document.createElement('div');
+        // присваиваем окну классы 
+        thanksModal.classList.add('modal__dialog');
+        // структура окна 
+        thanksModal.innerHTML = `
+            <div class="modal__content">
+                <div class="modal__close" data-close>×</div>
+                <div class="modal_title" data-close>${message}</div>
+            </div>
+        `;
+        // вставляем наше созданно е окно в модал
+        document.querySelector('.modal').append(thanksModal);
+        // удаляем окно через время
+        setTimeout(() =>{
+            thanksModal.remove();
+            prevModalDialog.classList.add('show');
+            prevModalDialog.classList.remove('hide');
+            closeModal();
+            
+        }, 3000);
+    }
 
 
-
+    
 
 
 });
